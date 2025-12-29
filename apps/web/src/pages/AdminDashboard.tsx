@@ -7,6 +7,9 @@ interface ApplicationItem {
   application_code: string;
   status: string;
   startup_code: string;
+  name: string;
+  application_type: string;
+  requested_limit_cents: number;
   documents: { doc_type: string; filename: string }[];
 }
 
@@ -71,10 +74,14 @@ export default function AdminDashboard() {
         <h2 className="text-2xl font-semibold">Applications queue</h2>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           {applications.map((app) => (
-            <div key={app.application_code} className="rounded-2xl border border-slate-800 p-4">
+            <div key={app.application_code} className="rounded-2xl border border-slate-200 dark:border-slate-800 p-4">
               <div className="text-sm text-slate-400">{app.application_code}</div>
-              <div className="mt-2 text-lg font-semibold">{app.startup_code}</div>
-              <div className="mt-2 text-xs text-slate-500">Status: {app.status}</div>
+              <div className="mt-2 text-lg font-semibold">{app.name}</div>
+              <div className="text-xs text-slate-500 dark:text-slate-400">{app.application_type}</div>
+              <div className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                {app.startup_code} · ${(app.requested_limit_cents / 100).toLocaleString()}
+              </div>
+              <div className="mt-2 text-xs text-slate-500 dark:text-slate-400">Status: {app.status}</div>
               <div className="mt-2 text-xs text-slate-500">
                 Docs: {app.documents.map((doc) => doc.doc_type).join(", ") || "None"}
               </div>
@@ -93,7 +100,7 @@ export default function AdminDashboard() {
         <h3 className="text-lg font-semibold">Rounds</h3>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           {rounds.map((round) => (
-            <div key={round.round_code} className="rounded-2xl border border-slate-800 p-4 text-sm text-slate-400">
+            <div key={round.round_code} className="rounded-2xl border border-slate-200 dark:border-slate-800 p-4 text-sm text-slate-400">
               <div>{round.round_code}</div>
               <div>Status: {round.status}</div>
               <div>Tier: {round.tier_selected ?? "Not set"}</div>
@@ -115,7 +122,7 @@ export default function AdminDashboard() {
         </div>
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <input
-            className="rounded-2xl border border-slate-800 bg-slate-950 px-4 py-2 text-sm"
+            className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950 px-4 py-2 text-sm"
             value={exitCode}
             onChange={(e) => setExitCode(e.target.value)}
           />
@@ -124,7 +131,7 @@ export default function AdminDashboard() {
             Settle exit (loan)
           </Button>
         </div>
-        {message && <div className="mt-3 text-sm text-emerald-300">{message}</div>}
+        {message && <div className="mt-3 text-sm text-slate-500 dark:text-slate-400">{message}</div>}
       </Card>
     </div>
   );

@@ -1,6 +1,8 @@
 import { PropsWithChildren } from "react";
+import { Link } from "react-router-dom";
 import { DarkModeToggle } from "../components/DarkModeToggle";
 import { Button } from "../components/ui/button";
+import { useAuth } from "../lib/auth";
 
 interface AppShellProps {
   companyName: string;
@@ -9,12 +11,16 @@ interface AppShellProps {
 }
 
 export function AppShell({ children, companyName, onSignIn, showPublicNav }: PropsWithChildren<AppShellProps>) {
+  const auth = useAuth();
+  const homeLink = auth.role ? `/app/${auth.role}` : "/";
   return (
-    <div className="min-h-screen bg-gradient-to-b from-cream via-cream to-slate-100 text-slate-900 dark:from-charcoal dark:via-charcoal dark:to-slate-950 dark:text-slate-100">
+    <div className="min-h-screen bg-cream text-slate-900 dark:bg-charcoal dark:text-slate-100">
       <header className="sticky top-0 z-50 border-b border-slate-200 bg-cream/80 backdrop-blur dark:border-slate-800 dark:bg-charcoal/80">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-6">
-            <span className="text-lg font-semibold">{companyName}</span>
+            <Link to={homeLink} className="text-lg font-semibold">
+              {companyName}
+            </Link>
           </div>
           <div className="flex items-center gap-3">
             {showPublicNav && (

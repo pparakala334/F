@@ -19,22 +19,45 @@ class Startup(Base):
     __tablename__ = "startups"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     founder_user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    name: Mapped[str] = mapped_column(String(255))
-    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    legal_name: Mapped[str] = mapped_column(String(255))
+    operating_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
     country: Mapped[str] = mapped_column(String(2), default="CA")
+    incorporation_type: Mapped[str] = mapped_column(String(50))
+    incorporation_date: Mapped[str] = mapped_column(String(20))
     website: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    status: Mapped[str] = mapped_column(String(20), default="active")
+    logo_key: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    industry: Mapped[str] = mapped_column(String(100))
+    sub_industry: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    short_description: Mapped[str] = mapped_column(String(255))
+    long_description: Mapped[str] = mapped_column(Text)
+    current_monthly_revenue: Mapped[str] = mapped_column(String(50))
+    revenue_model: Mapped[str] = mapped_column(String(50))
+    revenue_consistency: Mapped[str] = mapped_column(String(50))
+    revenue_stage: Mapped[str] = mapped_column(String(50))
+    existing_debt: Mapped[bool] = mapped_column(Integer, default=0)
+    existing_investors: Mapped[bool] = mapped_column(Integer, default=0)
+    intended_use_of_funds: Mapped[str] = mapped_column(Text)
+    target_funding_size: Mapped[str] = mapped_column(String(50))
+    preferred_timeline: Mapped[str] = mapped_column(String(50))
+    status: Mapped[str] = mapped_column(String(20), default="draft")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
 class Application(Base):
     __tablename__ = "applications"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     startup_id: Mapped[int] = mapped_column(ForeignKey("startups.id"))
-    status: Mapped[str] = mapped_column(String(20), default="pending")
+    name: Mapped[str] = mapped_column(String(255))
+    application_type: Mapped[str] = mapped_column(String(50))
+    requested_limit_cents: Mapped[int] = mapped_column(Integer)
+    risk_preference: Mapped[str] = mapped_column(String(20))
+    status: Mapped[str] = mapped_column(String(20), default="draft")
     fee_payment_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    submitted_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    submitted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     reviewed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     reviewer_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    admin_notes: Mapped[str | None] = mapped_column(Text, nullable=True)
 
 
 class Document(Base):
@@ -51,6 +74,7 @@ class Round(Base):
     __tablename__ = "rounds"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     startup_id: Mapped[int] = mapped_column(ForeignKey("startups.id"))
+    application_id: Mapped[int] = mapped_column(ForeignKey("applications.id"))
     title: Mapped[str] = mapped_column(String(255))
     max_raise_cents: Mapped[int] = mapped_column(Integer)
     tier_selected: Mapped[str | None] = mapped_column(String(20), nullable=True)
@@ -103,6 +127,7 @@ class RevenueReport(Base):
     month: Mapped[str] = mapped_column(String(20))
     gross_revenue_cents: Mapped[int] = mapped_column(Integer)
     reported_by: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    distribution_status: Mapped[str] = mapped_column(String(20), default="pending")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 

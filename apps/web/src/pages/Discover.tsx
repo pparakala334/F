@@ -46,7 +46,7 @@ export default function Discover() {
                 <div>Tier: {round.selected_tier}</div>
               </div>
               <Link
-                className="mt-6 inline-flex text-sm text-indigo-300 hover:text-indigo-200"
+                className="mt-6 inline-flex text-sm text-slate-600 hover:text-slate-800 dark:text-slate-300 dark:hover:text-slate-100"
                 to={`/rounds/${round.round_code}`}
               >
                 View details

@@ -39,19 +39,19 @@ export default function Providers() {
         <h3 className="text-lg font-semibold">Create a listing</h3>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           <input
-            className="rounded-2xl border border-slate-800 bg-slate-950 px-4 py-2 text-sm"
+            className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950 px-4 py-2 text-sm"
             placeholder="Provider name"
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
           />
           <input
-            className="rounded-2xl border border-slate-800 bg-slate-950 px-4 py-2 text-sm"
+            className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950 px-4 py-2 text-sm"
             placeholder="Category"
             value={form.category}
             onChange={(e) => setForm({ ...form, category: e.target.value })}
           />
           <input
-            className="rounded-2xl border border-slate-800 bg-slate-950 px-4 py-2 text-sm"
+            className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950 px-4 py-2 text-sm"
             placeholder="Description"
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
@@ -69,7 +69,7 @@ export default function Providers() {
           </Card>
         ))}
       </div>
-      {message && <div className="text-sm text-emerald-300">{message}</div>}
+      {message && <div className="text-sm text-slate-500 dark:text-slate-400">{message}</div>}
     </div>
   );
 }

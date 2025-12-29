@@ -3,6 +3,7 @@ from app.models import User, Startup, Application, Round, TierOption
 from app.auth.security import hash_password
 from app.algorithm.service import calculate_tiers
 from app.settings import settings
+import json
 
 
 def seed():
@@ -22,17 +23,48 @@ def seed():
     db.add_all([admin, founder, investor])
     db.commit()
 
-    startup = Startup(founder_user_id=founder.id, name="Northlake Labs", description="AI workflow", country="CA")
+    startup = Startup(
+        founder_user_id=founder.id,
+        legal_name="Steelman Industries",
+        operating_name="Steelman",
+        country="CA",
+        incorporation_type="Corp",
+        incorporation_date="2021-01-01",
+        website="https://steelman.example",
+        logo_key=None,
+        industry="Fintech",
+        sub_industry="Revenue share",
+        short_description="Compliance-first revenue-share platform.",
+        long_description="A revenue-share marketplace for aligned capital.",
+        current_monthly_revenue="$25k-$50k",
+        revenue_model="SaaS",
+        revenue_consistency="Stable",
+        revenue_stage="Stable",
+        existing_debt=0,
+        existing_investors=1,
+        intended_use_of_funds=json.dumps(["Hiring", "Product"]),
+        target_funding_size="$250k-$1M",
+        preferred_timeline="3-6 months",
+        status="draft",
+    )
     db.add(startup)
     db.commit()
 
-    application = Application(startup_id=startup.id, status="pending")
+    application = Application(
+        startup_id=startup.id,
+        name="Initial Funding Application",
+        application_type="Initial Funding Application",
+        requested_limit_cents=5000000,
+        risk_preference="medium",
+        status="approved",
+    )
     db.add(application)
     db.commit()
 
     round_obj = Round(
         startup_id=startup.id,
-        title="Series R Rev-Share",
+        application_id=application.id,
+        title="Revenue Share Round",
         max_raise_cents=5000000,
         status="published",
         tier_selected="medium",

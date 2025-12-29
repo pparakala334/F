@@ -132,7 +132,10 @@ export default function Landing() {
         ))}
       </section>
 
-      <section id="pricing" className="rounded-3xl border border-slate-200 bg-gradient-to-r from-amber-200/30 to-transparent p-10 dark:border-slate-800 dark:from-amber-500/10">
+      <section
+        id="pricing"
+        className="rounded-3xl border border-slate-200 bg-gradient-to-r from-charcoal/10 to-transparent p-10 dark:border-slate-800 dark:from-cream/10"
+      >
         <div className="grid gap-6 lg:grid-cols-2">
           <div>
             <h2 className="text-2xl font-semibold">Transparent pricing</h2>

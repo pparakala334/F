@@ -12,8 +12,8 @@ export function InfoModal({ open, onOpenChange, title, description }: InfoModalP
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-slate-950/70" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 w-[90%] max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-slate-800 bg-slate-950 p-6">
+        <Dialog.Overlay className="fixed inset-0 bg-charcoal/40 dark:bg-black/70" />
+        <Dialog.Content className="fixed left-1/2 top-1/2 w-[90%] max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-slate-200 bg-cream p-6 text-slate-900 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100">
           <Dialog.Title className="text-lg font-semibold">{title}</Dialog.Title>
           <Dialog.Description className="mt-3 text-sm text-slate-400">{description}</Dialog.Description>
           <div className="mt-6 flex justify-end">

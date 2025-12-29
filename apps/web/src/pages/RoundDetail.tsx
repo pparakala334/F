@@ -47,7 +47,7 @@ export default function RoundDetail() {
             Disclaimer: This is not legal, financial, or investment advice. Returns are not guaranteed.
           </div>
         )}
-        {message && <div className="mt-3 text-sm text-emerald-300">{message}</div>}
+        {message && <div className="mt-3 text-sm text-slate-500 dark:text-slate-400">{message}</div>}
       </Card>
       <div className="grid gap-6 lg:grid-cols-3">
         {tiers.map((tier) => (

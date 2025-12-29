@@ -1,5 +1,5 @@
 import { PropsWithChildren, useEffect } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { DarkModeToggle } from "../components/DarkModeToggle";
 import { useAuth } from "../lib/auth";
 
@@ -10,7 +10,7 @@ interface AppLayoutProps {
 
 const navItems: Record<string, { to: string; label: string }[]> = {
   founder: [
-    { to: "/app/founder", label: "Dashboard" },
+    { to: "/app/founder", label: "Startups" },
     { to: "/app/founder/exits", label: "Exits" },
   ],
   investor: [
@@ -43,7 +43,9 @@ export function AppLayout({ children, role, companyName }: PropsWithChildren<App
     <div className="min-h-screen bg-cream text-slate-900 dark:bg-charcoal dark:text-slate-100">
       <div className="flex">
         <aside className="hidden min-h-screen w-64 border-r border-slate-200 bg-cream/90 p-6 dark:border-slate-800 dark:bg-charcoal/90 md:block">
-          <div className="text-lg font-semibold">{companyName}</div>
+          <Link to={`/app/${role}`} className="text-lg font-semibold">
+            {companyName}
+          </Link>
           <nav className="mt-8 space-y-2 text-sm">
             {navItems[role]?.map((item) => (
               <NavLink

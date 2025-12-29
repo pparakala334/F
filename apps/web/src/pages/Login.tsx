@@ -38,19 +38,19 @@ export default function Login() {
       </p>
       <div className="mt-6 space-y-4">
         <input
-          className="w-full rounded-2xl border border-slate-800 bg-slate-950 px-4 py-3 text-sm"
+          className="w-full rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950 px-4 py-3 text-sm"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Email"
         />
         <input
           type="password"
-          className="w-full rounded-2xl border border-slate-800 bg-slate-950 px-4 py-3 text-sm"
+          className="w-full rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950 px-4 py-3 text-sm"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
         />
-        {error && <div className="text-sm text-rose-400">{error}</div>}
+        {error && <div className="text-sm text-slate-600 dark:text-slate-300">{error}</div>}
         <div className="flex gap-3">
           <Button onClick={handleLogin}>Login</Button>
           {okta.enabled && <Button variant="outline">Continue with Okta</Button>}

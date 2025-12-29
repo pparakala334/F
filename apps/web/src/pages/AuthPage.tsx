@@ -78,7 +78,7 @@ export default function AuthPage({ onAuthed }: AuthPageProps) {
               />
             </div>
           )}
-          {error && <div className="text-sm text-rose-500">{error}</div>}
+          {error && <div className="text-sm text-slate-600 dark:text-slate-300">{error}</div>}
           <Button className="w-full" onClick={submit}>
             {mode === "signin" ? "Sign in" : "Create account"}
           </Button>

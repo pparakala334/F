@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import json
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -6,7 +7,7 @@ from sqlalchemy import func
 
 from app.auth.router import get_current_user
 from app.db import get_db
-from app.models import Round, Startup, TierOption, Investment, Contract, ExitRequest, Payout
+from app.models import Round, Startup, TierOption, Investment, Contract, ExitRequest, Payout, RevenueReport, Application
 from app.providers.payments import collect_investment
 from app.settings import settings
 
@@ -27,7 +28,11 @@ def list_rounds(db: Session = Depends(get_db)):
         response.append(
             {
                 "round_code": f"RND-{round_obj.id:04d}",
-                "startup_name": startup.name if startup else "Confidential",
+                "startup_name": startup.operating_name or startup.legal_name,
+                "industry": startup.industry,
+                "short_description": startup.short_description,
+                "country": startup.country,
+                "revenue_stage": startup.revenue_stage,
                 "max_raise_cents": round_obj.max_raise_cents,
                 "tier_selected": round_obj.tier_selected,
                 "raised_cents": raised,
@@ -46,9 +51,21 @@ def round_detail(round_id: int, db: Session = Depends(get_db)):
         .filter(TierOption.round_id == round_id, TierOption.tier == round_obj.tier_selected)
         .first()
     )
+    startup = db.query(Startup).filter(Startup.id == round_obj.startup_id).first()
+    reports = db.query(RevenueReport).filter(RevenueReport.startup_id == round_obj.startup_id).all()
     return {
         "round_code": f"RND-{round_obj.id:04d}",
         "max_raise_cents": round_obj.max_raise_cents,
+        "startup": {
+            "name": startup.operating_name or startup.legal_name,
+            "industry": startup.industry,
+            "country": startup.country,
+            "short_description": startup.short_description,
+            "long_description": startup.long_description,
+            "revenue_model": startup.revenue_model,
+            "use_of_funds": json.loads(startup.intended_use_of_funds),
+            "revenue_stage": startup.revenue_stage,
+        },
         "tier": {
             "revenue_share_bps": tier.revenue_share_bps if tier else 0,
             "time_cap_months": tier.time_cap_months if tier else 0,
@@ -56,7 +73,15 @@ def round_detail(round_id: int, db: Session = Depends(get_db)):
             "min_hold_days": tier.min_hold_days if tier else 0,
             "exit_fee_bps_quarterly": tier.exit_fee_bps_quarterly if tier else 0,
             "exit_fee_bps_offcycle": tier.exit_fee_bps_offcycle if tier else 0,
+            "explanation_json": tier.explanation_json if tier else "{}",
         },
+        "revenue_reports": [
+            {
+                "month": report.month,
+                "gross_revenue_cents": report.gross_revenue_cents,
+            }
+            for report in reports
+        ],
     }
 
 
@@ -66,11 +91,7 @@ class InvestRequest(BaseModel):
 
 
 @router.post("/invest")
-def invest(
-    payload: InvestRequest,
-    db: Session = Depends(get_db),
-    current_user=Depends(get_current_user),
-):
+def invest(payload: InvestRequest, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     if current_user.role != "investor":
         raise HTTPException(status_code=403, detail="Forbidden")
     round_obj = db.query(Round).filter(Round.id == payload.round_id).first()
@@ -119,10 +140,7 @@ def invest(
 
 
 @router.get("/portfolio")
-def portfolio(
-    db: Session = Depends(get_db),
-    current_user=Depends(get_current_user),
-):
+def portfolio(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     if current_user.role != "investor":
         raise HTTPException(status_code=403, detail="Forbidden")
     investments = db.query(Investment).filter(Investment.investor_user_id == current_user.id).all()
@@ -148,11 +166,7 @@ class ExitRequestCreate(BaseModel):
 
 
 @router.post("/exits/request")
-def request_exit(
-    payload: ExitRequestCreate,
-    db: Session = Depends(get_db),
-    current_user=Depends(get_current_user),
-):
+def request_exit(payload: ExitRequestCreate, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     if current_user.role != "investor":
         raise HTTPException(status_code=403, detail="Forbidden")
     if payload.exit_type not in {"quarterly", "offcycle"}:
@@ -180,10 +194,7 @@ def request_exit(
 
 
 @router.get("/payouts")
-def payout_history(
-    db: Session = Depends(get_db),
-    current_user=Depends(get_current_user),
-):
+def payout_history(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     if current_user.role != "investor":
         raise HTTPException(status_code=403, detail="Forbidden")
     investment_ids = [

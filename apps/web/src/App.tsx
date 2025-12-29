@@ -6,7 +6,8 @@ import { AppLayout } from "./layouts/AppLayout";
 import { useAuth } from "./lib/auth";
 import { apiGet } from "./lib/api";
 import Landing from "./pages/Landing";
-import FounderDashboard from "./pages/FounderDashboard";
+import FounderStartups from "./pages/FounderStartups";
+import FounderStartupDetail from "./pages/FounderStartupDetail";
 import InvestorDashboard from "./pages/InvestorDashboard";
 import InvestorPortfolio from "./pages/InvestorPortfolio";
 import InvestorPayouts from "./pages/InvestorPayouts";
@@ -75,7 +76,15 @@ export default function App() {
               path="/app/founder"
               element={
                 <AppLayout role="founder" companyName={companyName}>
-                  <FounderDashboard />
+                  <FounderStartups />
+                </AppLayout>
+              }
+            />
+            <Route
+              path="/app/founder/startups/:startupId"
+              element={
+                <AppLayout role="founder" companyName={companyName}>
+                  <FounderStartupDetail />
                 </AppLayout>
               }
             />
