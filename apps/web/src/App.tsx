@@ -1,18 +1,20 @@
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { AppShell } from "./layouts/AppShell";
+import { AppLayout } from "./layouts/AppLayout";
 import { useAuth } from "./lib/auth";
 import { apiGet } from "./lib/api";
 import Landing from "./pages/Landing";
-import Login from "./pages/Login";
-import Discover from "./pages/Discover";
-import RoundDetail from "./pages/RoundDetail";
-import Portfolio from "./pages/Portfolio";
 import FounderDashboard from "./pages/FounderDashboard";
+import InvestorDashboard from "./pages/InvestorDashboard";
+import InvestorPortfolio from "./pages/InvestorPortfolio";
+import InvestorPayouts from "./pages/InvestorPayouts";
+import InvestorExits from "./pages/InvestorExits";
+import FounderExits from "./pages/FounderExits";
 import AdminDashboard from "./pages/AdminDashboard";
-import Providers from "./pages/Providers";
-import Disclaimer from "./pages/Disclaimer";
+import AdminLedger from "./pages/AdminLedger";
+import { AuthModal } from "./components/AuthModal";
 
 const PageWrapper = ({ children }: { children: React.ReactNode }) => (
   <motion.div
@@ -27,10 +29,12 @@ const PageWrapper = ({ children }: { children: React.ReactNode }) => (
 
 export default function App() {
   const location = useLocation();
+  const navigate = useNavigate();
   const auth = useAuth();
   const [companyName, setCompanyName] = useState(
     auth.companyName ?? import.meta.env.VITE_COMPANY_NAME ?? "Radion"
   );
+  const [authOpen, setAuthOpen] = useState(false);
 
   useEffect(() => {
     apiGet<{ company: string }>("/health")
@@ -38,21 +42,103 @@ export default function App() {
       .catch(() => undefined);
   }, []);
 
+  useEffect(() => {
+    auth.loadMe();
+  }, [auth]);
+
+  const handleAuthed = (role: string) => {
+    if (role === "admin") {
+      navigate("/app/admin");
+    } else if (role === "investor") {
+      navigate("/app/investor");
+    } else {
+      navigate("/app/founder");
+    }
+  };
+
+  const isAppRoute = location.pathname.startsWith("/app");
+
   return (
-    <AppShell role={auth.role} companyName={companyName}>
-      <AnimatePresence mode="wait">
-        <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<PageWrapper><Landing /></PageWrapper>} />
-          <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
-          <Route path="/discover" element={<PageWrapper><Discover /></PageWrapper>} />
-          <Route path="/rounds/:roundCode" element={<PageWrapper><RoundDetail /></PageWrapper>} />
-          <Route path="/portfolio" element={<PageWrapper><Portfolio /></PageWrapper>} />
-          <Route path="/founder" element={<PageWrapper><FounderDashboard /></PageWrapper>} />
-          <Route path="/admin" element={<PageWrapper><AdminDashboard /></PageWrapper>} />
-          <Route path="/providers" element={<PageWrapper><Providers /></PageWrapper>} />
-          <Route path="/disclaimer" element={<PageWrapper><Disclaimer /></PageWrapper>} />
-        </Routes>
-      </AnimatePresence>
-    </AppShell>
+    <>
+      {!isAppRoute ? (
+        <AppShell companyName={companyName} onSignIn={() => setAuthOpen(true)} showPublicNav>
+          <AnimatePresence mode="wait">
+            <Routes location={location} key={location.pathname}>
+              <Route path="/" element={<PageWrapper><Landing /></PageWrapper>} />
+            </Routes>
+          </AnimatePresence>
+        </AppShell>
+      ) : (
+        <AnimatePresence mode="wait">
+          <Routes location={location} key={location.pathname}>
+            <Route
+              path="/app/founder"
+              element={
+                <AppLayout role="founder" companyName={companyName}>
+                  <FounderDashboard />
+                </AppLayout>
+              }
+            />
+            <Route
+              path="/app/founder/exits"
+              element={
+                <AppLayout role="founder" companyName={companyName}>
+                  <FounderExits />
+                </AppLayout>
+              }
+            />
+            <Route
+              path="/app/investor"
+              element={
+                <AppLayout role="investor" companyName={companyName}>
+                  <InvestorDashboard />
+                </AppLayout>
+              }
+            />
+            <Route
+              path="/app/investor/portfolio"
+              element={
+                <AppLayout role="investor" companyName={companyName}>
+                  <InvestorPortfolio />
+                </AppLayout>
+              }
+            />
+            <Route
+              path="/app/investor/exits"
+              element={
+                <AppLayout role="investor" companyName={companyName}>
+                  <InvestorExits />
+                </AppLayout>
+              }
+            />
+            <Route
+              path="/app/investor/payouts"
+              element={
+                <AppLayout role="investor" companyName={companyName}>
+                  <InvestorPayouts />
+                </AppLayout>
+              }
+            />
+            <Route
+              path="/app/admin"
+              element={
+                <AppLayout role="admin" companyName={companyName}>
+                  <AdminDashboard />
+                </AppLayout>
+              }
+            />
+            <Route
+              path="/app/admin/ledger"
+              element={
+                <AppLayout role="admin" companyName={companyName}>
+                  <AdminLedger />
+                </AppLayout>
+              }
+            />
+          </Routes>
+        </AnimatePresence>
+      )}
+      <AuthModal open={authOpen} onOpenChange={setAuthOpen} onAuthed={handleAuthed} />
+    </>
   );
 }

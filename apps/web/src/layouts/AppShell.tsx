@@ -1,59 +1,49 @@
 import { PropsWithChildren } from "react";
-import { NavLink } from "react-router-dom";
 import { DarkModeToggle } from "../components/DarkModeToggle";
+import { Button } from "../components/ui/button";
 
 interface AppShellProps {
-  role?: string | null;
   companyName: string;
+  onSignIn?: () => void;
+  showPublicNav?: boolean;
 }
 
-const baseNav = [
-  { to: "/", label: "Landing" },
-  { to: "/discover", label: "Discover" },
-  { to: "/disclaimer", label: "Disclaimer" },
+const publicNav = [
+  { href: "#product", label: "Product" },
+  { href: "#how", label: "How it works" },
+  { href: "#pricing", label: "Pricing" },
+  { href: "#safety", label: "Safety" },
+  { href: "#faq", label: "FAQ" },
 ];
 
-const roleNav: Record<string, { to: string; label: string }[]> = {
-  founder: [
-    { to: "/founder", label: "Founder" },
-    { to: "/rounds", label: "My Rounds" },
-  ],
-  investor: [
-    { to: "/portfolio", label: "Portfolio" },
-    { to: "/discover", label: "Discover" },
-  ],
-  admin: [
-    { to: "/admin", label: "Admin" },
-  ],
-  service_provider: [
-    { to: "/providers", label: "Providers" },
-  ],
-};
-
-export function AppShell({ children, role, companyName }: PropsWithChildren<AppShellProps>) {
-  const nav = [...baseNav, ...(role ? roleNav[role] ?? [] : [])];
-
+export function AppShell({ children, companyName, onSignIn, showPublicNav }: PropsWithChildren<AppShellProps>) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-950 to-slate-900 text-slate-100">
       <header className="sticky top-0 z-50 border-b border-slate-800 bg-slate-950/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             <span className="text-lg font-semibold">{companyName}</span>
-            <nav className="hidden gap-4 md:flex">
-              {nav.map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  className={({ isActive }) =>
-                    `text-sm ${isActive ? "text-white" : "text-slate-400"}`
-                  }
-                >
-                  {item.label}
-                </NavLink>
-              ))}
-            </nav>
+            {showPublicNav && (
+              <nav className="hidden gap-4 md:flex">
+                {publicNav.map((item) => (
+                  <a key={item.href} href={item.href} className="text-sm text-slate-400 hover:text-white">
+                    {item.label}
+                  </a>
+                ))}
+                <button onClick={onSignIn} className="text-sm text-slate-200 hover:text-white">
+                  Sign in
+                </button>
+              </nav>
+            )}
           </div>
-          <DarkModeToggle />
+          <div className="flex items-center gap-3">
+            {showPublicNav && (
+              <Button onClick={onSignIn} variant="outline">
+                Sign in
+              </Button>
+            )}
+            <DarkModeToggle />
+          </div>
         </div>
       </header>
       <main className="mx-auto max-w-6xl px-6 py-10">{children}</main>

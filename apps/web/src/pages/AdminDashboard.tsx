@@ -1,58 +1,89 @@
 import { useEffect, useState } from "react";
-import { Button } from "../components/ui/button";
 import { Card } from "../components/Card";
-import { StatusPill } from "../components/StatusPill";
+import { Button } from "../components/ui/button";
 import { apiGet, apiPost } from "../lib/api";
 
 interface ApplicationItem {
   application_code: string;
   status: string;
-  company_name: string;
+  startup_code: string;
+  documents: { doc_type: string; filename: string }[];
 }
 
 interface RoundItem {
   round_code: string;
   status: string;
-  selected_tier: string;
+  tier_selected: string | null;
 }
 
 export default function AdminDashboard() {
   const [applications, setApplications] = useState<ApplicationItem[]>([]);
   const [rounds, setRounds] = useState<RoundItem[]>([]);
   const [message, setMessage] = useState<string | null>(null);
+  const [exitCode, setExitCode] = useState("EXIT-0001");
 
-  useEffect(() => {
+  const load = () => {
     apiGet<ApplicationItem[]>("/admin/applications").then(setApplications).catch(() => setApplications([]));
     apiGet<RoundItem[]>("/admin/rounds").then(setRounds).catch(() => setRounds([]));
+  };
+
+  useEffect(() => {
+    load();
   }, []);
 
+  const approve = async (code: string) => {
+    const id = Number(code.split("-")[1]);
+    await apiPost(`/admin/applications/${id}/approve`, {});
+    load();
+  };
+
+  const deny = async (code: string) => {
+    const id = Number(code.split("-")[1]);
+    await apiPost(`/admin/applications/${id}/deny`, {});
+    load();
+  };
+
   const runDistribution = async () => {
-    await apiPost("/distributions/run-month", {});
-    setMessage("Monthly distribution executed (demo).")
+    await apiPost("/admin/distributions/run", { startup_id: 1, month: "2024-06-01" });
+    setMessage("Distribution executed.");
   };
 
-  const createExit = async () => {
-    await apiPost("/admin/demo/exit-request", { contract_id: 1, window: "quarterly" });
-    setMessage("Exit request created (demo).")
+  const simulateRevenue = async () => {
+    await apiPost("/admin/revenue/simulate", { startup_id: 1, month: "2024-06-01", gross_revenue_cents: 450000 });
+    setMessage("Revenue simulated.");
   };
 
-  const settleExit = async (settlement: "cash" | "loan") => {
-    await apiPost("/admin/demo/settle-exit", { exit_request_id: 1, settlement });
-    setMessage(`Exit settled with ${settlement} (demo).`)
+  const seed = async () => {
+    await apiPost("/admin/demo/seed", {});
+    setMessage("Seed data created.");
+    load();
+  };
+
+  const settleExit = async (method: string) => {
+    const id = Number(exitCode.split("-")[1]);
+    await apiPost(`/admin/exits/${id}/settle?settlement_method=${method}`, {});
+    setMessage(`Exit settled with ${method}.`);
   };
 
   return (
     <div className="space-y-8">
       <Card className="p-6">
-        <h2 className="text-2xl font-semibold">Admin review queue</h2>
+        <h2 className="text-2xl font-semibold">Applications queue</h2>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           {applications.map((app) => (
             <div key={app.application_code} className="rounded-2xl border border-slate-800 p-4">
-              <div className="flex items-center justify-between">
-                <div className="font-semibold">{app.company_name}</div>
-                <StatusPill status={app.status} />
+              <div className="text-sm text-slate-400">{app.application_code}</div>
+              <div className="mt-2 text-lg font-semibold">{app.startup_code}</div>
+              <div className="mt-2 text-xs text-slate-500">Status: {app.status}</div>
+              <div className="mt-2 text-xs text-slate-500">
+                Docs: {app.documents.map((doc) => doc.doc_type).join(", ") || "None"}
               </div>
-              <div className="text-xs text-slate-400">{app.application_code}</div>
+              <div className="mt-3 flex gap-2">
+                <Button onClick={() => approve(app.application_code)}>Approve</Button>
+                <Button variant="outline" onClick={() => deny(app.application_code)}>
+                  Deny
+                </Button>
+              </div>
             </div>
           ))}
         </div>
@@ -62,12 +93,10 @@ export default function AdminDashboard() {
         <h3 className="text-lg font-semibold">Rounds</h3>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           {rounds.map((round) => (
-            <div key={round.round_code} className="rounded-2xl border border-slate-800 p-4">
-              <div className="flex items-center justify-between">
-                <div>{round.round_code}</div>
-                <StatusPill status={round.status} />
-              </div>
-              <div className="text-xs text-slate-400">Tier: {round.selected_tier}</div>
+            <div key={round.round_code} className="rounded-2xl border border-slate-800 p-4 text-sm text-slate-400">
+              <div>{round.round_code}</div>
+              <div>Status: {round.status}</div>
+              <div>Tier: {round.tier_selected ?? "Not set"}</div>
             </div>
           ))}
         </div>
@@ -75,12 +104,25 @@ export default function AdminDashboard() {
 
       <Card className="p-6">
         <h3 className="text-lg font-semibold">Demo actions</h3>
-        <p className="text-sm text-slate-400">Use these controls to simulate platform operations.</p>
         <div className="mt-4 flex flex-wrap gap-3">
-          <Button onClick={runDistribution}>Run monthly distribution</Button>
-          <Button variant="outline" onClick={createExit}>Create exit request</Button>
-          <Button variant="ghost" onClick={() => settleExit("cash")}>Settle with cash</Button>
-          <Button variant="ghost" onClick={() => settleExit("loan")}>Settle with loan referral</Button>
+          <Button onClick={seed}>Seed demo data</Button>
+          <Button variant="outline" onClick={simulateRevenue}>
+            Simulate revenue report
+          </Button>
+          <Button variant="outline" onClick={runDistribution}>
+            Run monthly distribution
+          </Button>
+        </div>
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <input
+            className="rounded-2xl border border-slate-800 bg-slate-950 px-4 py-2 text-sm"
+            value={exitCode}
+            onChange={(e) => setExitCode(e.target.value)}
+          />
+          <Button onClick={() => settleExit("cash")}>Settle exit (cash)</Button>
+          <Button variant="outline" onClick={() => settleExit("loan")}>
+            Settle exit (loan)
+          </Button>
         </div>
         {message && <div className="mt-3 text-sm text-emerald-300">{message}</div>}
       </Card>

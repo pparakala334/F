@@ -34,9 +34,18 @@ docker-compose -f infra/docker-compose.yml exec api python /scripts/seed_demo_da
 
 ### Demo Accounts
 
-- Admin: `admin@demo.com` / `password`
+- Admin: `admin@demo.com` / `password` (override with `ADMIN_EMAIL` + `ADMIN_PASSWORD`)
 - Founder: `founder@demo.com` / `password`
 - Investor: `investor@demo.com` / `password`
+
+## Full Workflow Test
+
+1. Open the web app and click **Sign in** in the top nav.
+2. Sign in as **admin** and use **Seed demo data** in the admin panel.
+3. Sign in as **founder** and run through the guided flow:
+   - Create startup → Submit application → Upload docs → Create round → Run tiers → Select tier → Publish.
+4. Sign in as **investor** to discover rounds and invest.
+5. Sign in as **admin** and run a monthly distribution to record payouts.
 
 ## Notes
 

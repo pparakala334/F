@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+psycopg://radion:radion@db:5432/radion"
     jwt_secret: str = "dev_secret"
     jwt_expire_minutes: int = 60
+    admin_email: str = "admin@demo.com"
+    admin_password: str = "password"
 
     enable_stripe: bool = False
     stripe_secret_key: str | None = None
