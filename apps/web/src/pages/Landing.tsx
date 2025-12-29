@@ -19,18 +19,24 @@ export default function Landing() {
   const [active, setActive] = useState("product");
 
   useEffect(() => {
-    const onScroll = () => {
-      const offsets = sections.map((section) => {
-        const el = document.getElementById(section.id);
-        if (!el) return { id: section.id, top: Number.POSITIVE_INFINITY };
-        return { id: section.id, top: Math.abs(el.getBoundingClientRect().top) };
-      });
-      const current = offsets.sort((a, b) => a.top - b.top)[0];
-      if (current?.id) setActive(current.id);
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible?.target?.id) {
+          setActive(visible.target.id);
+        }
+      },
+      { rootMargin: "-30% 0px -40% 0px", threshold: [0.2, 0.4, 0.6, 0.8] }
+    );
+
+    sections.forEach((section) => {
+      const el = document.getElementById(section.id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
   }, [sections]);
 
   return (
@@ -140,7 +146,7 @@ export default function Landing() {
         </div>
       </section>
 
-      <section id="safety" className="grid gap-6 lg:grid-cols-2">
+      <section id="safety" className="grid min-h-[320px] gap-6 lg:grid-cols-2">
         <Card className="p-6">
           <h3 className="text-lg font-semibold">Canada-first compliance controls</h3>
           <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
@@ -155,7 +161,7 @@ export default function Landing() {
         </Card>
       </section>
 
-      <section id="faq" className="grid gap-6 lg:grid-cols-2">
+      <section id="faq" className="grid min-h-[320px] gap-6 lg:grid-cols-2">
         <Card className="p-6">
           <h3 className="text-lg font-semibold">Is this equity?</h3>
           <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
@@ -172,7 +178,7 @@ export default function Landing() {
 
       <footer className="border-t border-slate-800 pt-8 text-sm text-slate-500">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <span>© 2024 Radion. All rights reserved.</span>
+          <span>© 2024 Steelman. All rights reserved.</span>
           <button onClick={() => setLegalOpen(true)} className="text-slate-400 hover:text-white">
             Legal & Disclosures
           </button>

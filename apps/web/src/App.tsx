@@ -14,7 +14,7 @@ import InvestorExits from "./pages/InvestorExits";
 import FounderExits from "./pages/FounderExits";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminLedger from "./pages/AdminLedger";
-import { AuthModal } from "./components/AuthModal";
+import AuthPage from "./pages/AuthPage";
 
 const PageWrapper = ({ children }: { children: React.ReactNode }) => (
   <motion.div
@@ -32,9 +32,8 @@ export default function App() {
   const navigate = useNavigate();
   const auth = useAuth();
   const [companyName, setCompanyName] = useState(
-    auth.companyName ?? import.meta.env.VITE_COMPANY_NAME ?? "Radion"
+    auth.companyName ?? import.meta.env.VITE_COMPANY_NAME ?? "Steelman"
   );
-  const [authOpen, setAuthOpen] = useState(false);
 
   useEffect(() => {
     apiGet<{ company: string }>("/health")
@@ -61,10 +60,11 @@ export default function App() {
   return (
     <>
       {!isAppRoute ? (
-        <AppShell companyName={companyName} onSignIn={() => setAuthOpen(true)} showPublicNav>
+        <AppShell companyName={companyName} onSignIn={() => navigate("/auth")} showPublicNav>
           <AnimatePresence mode="wait">
             <Routes location={location} key={location.pathname}>
               <Route path="/" element={<PageWrapper><Landing /></PageWrapper>} />
+              <Route path="/auth" element={<PageWrapper><AuthPage onAuthed={handleAuthed} /></PageWrapper>} />
             </Routes>
           </AnimatePresence>
         </AppShell>
@@ -138,7 +138,6 @@ export default function App() {
           </Routes>
         </AnimatePresence>
       )}
-      <AuthModal open={authOpen} onOpenChange={setAuthOpen} onAuthed={handleAuthed} />
     </>
   );
 }
