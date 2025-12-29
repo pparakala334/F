@@ -1,4 +1,4 @@
-# Radion Revenue-Share Marketplace (Demo)
+# Steelman Revenue-Share Marketplace (Demo)
 
 A production-structured monorepo for a revenue-share startup funding marketplace demo (non-equity). This demo includes end-to-end flows with simulated money movements and provider stubs.
 

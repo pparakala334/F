@@ -5,8 +5,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        surface: "#0b0f1a",
-        accent: "#7c5cff",
+        surface: "#0f0f0f",
+        accent: "#c9a227",
+        cream: "#f6f1e8",
+        charcoal: "#1f1f1f",
+        gold: "#c9a227",
       },
       boxShadow: {
         card: "0 20px 40px rgba(15, 23, 42, 0.08)",

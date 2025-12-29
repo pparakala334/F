@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    company_name: str = "Radion"
+    company_name: str = "Steelman"
     country_mode: str = "CA"
     database_url: str = "postgresql+psycopg://radion:radion@db:5432/radion"
     jwt_secret: str = "dev_secret"

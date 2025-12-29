@@ -2,12 +2,54 @@ import { motion } from "framer-motion";
 import { Button } from "../components/ui/button";
 import { Card } from "../components/Card";
 import { InfoModal } from "../components/InfoModal";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export default function Landing() {
   const [legalOpen, setLegalOpen] = useState(false);
+  const sections = useMemo(
+    () => [
+      { id: "product", label: "Product" },
+      { id: "how", label: "How it works" },
+      { id: "pricing", label: "Pricing" },
+      { id: "safety", label: "Safety" },
+      { id: "faq", label: "FAQ" },
+    ],
+    []
+  );
+  const [active, setActive] = useState("product");
+
+  useEffect(() => {
+    const onScroll = () => {
+      const offsets = sections.map((section) => {
+        const el = document.getElementById(section.id);
+        if (!el) return { id: section.id, top: Number.POSITIVE_INFINITY };
+        return { id: section.id, top: Math.abs(el.getBoundingClientRect().top) };
+      });
+      const current = offsets.sort((a, b) => a.top - b.top)[0];
+      if (current?.id) setActive(current.id);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [sections]);
+
   return (
-    <div className="space-y-20">
+    <div className="relative space-y-20">
+      <div className="pointer-events-auto fixed right-6 top-1/3 z-40 hidden flex-col gap-3 text-right md:flex">
+        {sections.map((section) => (
+          <a
+            key={section.id}
+            href={`#${section.id}`}
+            className={`transition-all ${
+              active === section.id
+                ? "text-lg font-semibold text-slate-900 dark:text-white"
+                : "text-xs text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+            }`}
+          >
+            {section.label}
+          </a>
+        ))}
+      </div>
       <section id="product" className="grid gap-8 lg:grid-cols-2 items-center">
         <div className="space-y-6">
           <motion.h1
@@ -18,7 +60,7 @@ export default function Landing() {
           >
             Revenue-share funding that keeps founders in control and investors aligned.
           </motion.h1>
-          <p className="text-slate-300">
+          <p className="text-slate-600 dark:text-slate-300">
             Launch revenue-share rounds with deterministic tiers, transparent caps, and automated reporting.
             Offer a clear path to exits without diluting ownership.
           </p>
@@ -29,21 +71,25 @@ export default function Landing() {
         </div>
         <Card className="p-6 glass">
           <div className="space-y-4">
-            <div className="text-sm uppercase tracking-wide text-slate-400">Marketplace snapshot</div>
+            <div className="text-sm uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              Marketplace snapshot
+            </div>
             <div className="text-2xl font-semibold">$28.4M committed capital</div>
-            <div className="text-sm text-slate-400">Illustrative projections only. No guaranteed returns.</div>
+            <div className="text-sm text-slate-500 dark:text-slate-400">
+              Illustrative projections only. No guaranteed returns.
+            </div>
             <div className="grid grid-cols-3 gap-3 text-center text-xs">
-              <div className="rounded-2xl bg-slate-900/60 p-4">
+              <div className="rounded-2xl bg-white/70 p-4 dark:bg-slate-900/60">
                 <div className="text-lg font-semibold">32</div>
-                <div className="text-slate-400">Active rounds</div>
+                <div className="text-slate-500 dark:text-slate-400">Active rounds</div>
               </div>
-              <div className="rounded-2xl bg-slate-900/60 p-4">
+              <div className="rounded-2xl bg-white/70 p-4 dark:bg-slate-900/60">
                 <div className="text-lg font-semibold">5.1%</div>
-                <div className="text-slate-400">Median share</div>
+                <div className="text-slate-500 dark:text-slate-400">Median share</div>
               </div>
-              <div className="rounded-2xl bg-slate-900/60 p-4">
+              <div className="rounded-2xl bg-white/70 p-4 dark:bg-slate-900/60">
                 <div className="text-lg font-semibold">1.6x</div>
-                <div className="text-slate-400">Median cap</div>
+                <div className="text-slate-500 dark:text-slate-400">Median cap</div>
               </div>
             </div>
           </div>
@@ -74,17 +120,17 @@ export default function Landing() {
           >
             <Card className="p-6">
               <h3 className="text-lg font-semibold">{section.title}</h3>
-              <p className="mt-3 text-sm text-slate-400">{section.body}</p>
+              <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">{section.body}</p>
             </Card>
           </motion.div>
         ))}
       </section>
 
-      <section id="pricing" className="rounded-3xl border border-slate-800 bg-gradient-to-r from-indigo-500/10 to-transparent p-10">
+      <section id="pricing" className="rounded-3xl border border-slate-200 bg-gradient-to-r from-amber-200/30 to-transparent p-10 dark:border-slate-800 dark:from-amber-500/10">
         <div className="grid gap-6 lg:grid-cols-2">
           <div>
             <h2 className="text-2xl font-semibold">Transparent pricing</h2>
-            <p className="mt-3 text-sm text-slate-300">
+            <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">
               Application fees, platform processing fees, and optional loan referral fees are disclosed before you publish.
             </p>
           </div>
@@ -97,13 +143,13 @@ export default function Landing() {
       <section id="safety" className="grid gap-6 lg:grid-cols-2">
         <Card className="p-6">
           <h3 className="text-lg font-semibold">Canada-first compliance controls</h3>
-          <p className="mt-3 text-sm text-slate-400">
+          <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
             Country-mode enforcement, identity verification, and audit trails keep the marketplace compliant.
           </p>
         </Card>
         <Card className="p-6">
           <h3 className="text-lg font-semibold">Operational transparency</h3>
-          <p className="mt-3 text-sm text-slate-400">
+          <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
             Investors receive reporting, payout history, and exit options with defined fees and holding periods.
           </p>
         </Card>
@@ -112,13 +158,13 @@ export default function Landing() {
       <section id="faq" className="grid gap-6 lg:grid-cols-2">
         <Card className="p-6">
           <h3 className="text-lg font-semibold">Is this equity?</h3>
-          <p className="mt-3 text-sm text-slate-400">
+          <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
             No. Investors receive a capped revenue share until a payout cap or time cap is reached.
           </p>
         </Card>
         <Card className="p-6">
           <h3 className="text-lg font-semibold">How are payouts calculated?</h3>
-          <p className="mt-3 text-sm text-slate-400">
+          <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
             Payouts are a fixed percentage of reported gross revenue and tracked in the platform ledger.
           </p>
         </Card>

@@ -40,9 +40,9 @@ export function AppLayout({ children, role, companyName }: PropsWithChildren<App
   }, [auth.role, auth.token, role, navigate]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
+    <div className="min-h-screen bg-cream text-slate-900 dark:bg-charcoal dark:text-slate-100">
       <div className="flex">
-        <aside className="hidden min-h-screen w-64 border-r border-slate-800 bg-slate-950/80 p-6 md:block">
+        <aside className="hidden min-h-screen w-64 border-r border-slate-200 bg-cream/90 p-6 dark:border-slate-800 dark:bg-charcoal/90 md:block">
           <div className="text-lg font-semibold">{companyName}</div>
           <nav className="mt-8 space-y-2 text-sm">
             {navItems[role]?.map((item) => (
@@ -50,7 +50,11 @@ export function AppLayout({ children, role, companyName }: PropsWithChildren<App
                 key={item.to}
                 to={item.to}
                 className={({ isActive }) =>
-                  `block rounded-xl px-3 py-2 ${isActive ? "bg-slate-800 text-white" : "text-slate-400"}`
+                  `block rounded-xl px-3 py-2 ${
+                    isActive
+                      ? "bg-slate-200 text-slate-900 dark:bg-slate-800 dark:text-white"
+                      : "text-slate-500 dark:text-slate-400"
+                  }`
                 }
               >
                 {item.label}
@@ -59,8 +63,8 @@ export function AppLayout({ children, role, companyName }: PropsWithChildren<App
           </nav>
         </aside>
         <div className="flex-1">
-          <header className="flex items-center justify-between border-b border-slate-800 bg-slate-950/80 px-6 py-4">
-            <div className="text-sm text-slate-400">Welcome back</div>
+          <header className="flex items-center justify-between border-b border-slate-200 bg-cream/80 px-6 py-4 dark:border-slate-800 dark:bg-charcoal/80">
+            <div className="text-sm text-slate-500 dark:text-slate-400">Welcome back</div>
             <DarkModeToggle />
           </header>
           <main className="px-6 py-8">{children}</main>
